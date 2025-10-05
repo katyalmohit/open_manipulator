@@ -236,19 +236,70 @@ void MainWindow::on_btn_read_joint_angle_clicked(void)
   writeLog("Read joint angle");
 }
 
-// void MainWindow::on_btn_send_joint_angle_clicked(void)
-// {
-//   std::vector<double> joint_angle;
+void MainWindow::on_btn_send_joint_angle_clicked(void)
+{
+  std::vector<double> joint_angle;
 
-//   joint_angle.push_back(ui.doubleSpinBox_j1->value());
-//   joint_angle.push_back(ui.doubleSpinBox_j2->value());
-//   joint_angle.push_back(ui.doubleSpinBox_j3->value());
-//   joint_angle.push_back(ui.doubleSpinBox_j4->value());
+  joint_angle.push_back(ui.doubleSpinBox_j1->value());
+  joint_angle.push_back(ui.doubleSpinBox_j2->value());
+  joint_angle.push_back(ui.doubleSpinBox_j3->value());
+  joint_angle.push_back(ui.doubleSpinBox_j4->value());
+
+  std::thread(
+    [this, joint_angle]()
+    {
+      bool success = qnode.setJointSpacePath(joint_angle);
+      if (!success) {
+        QMetaObject::invokeMethod(
+          this, [this]() {
+            writeLog("[ERR!!] Failed to send service");
+          }, Qt::QueuedConnection);
+      } else {
+        QMetaObject::invokeMethod(
+          this, [this]() {
+            writeLog("Send joint angle");
+          }, Qt::QueuedConnection);
+      }
+    }).detach();
+}
+
+
+void MainWindow::on_btn_read_kinematic_pose_clicked(void)
+{
+  std::vector<double> position = qnode.getPresentKinematicsPosition();
+  ui.doubleSpinBox_x->setValue(position.at(0));
+  ui.doubleSpinBox_y->setValue(position.at(1));
+  ui.doubleSpinBox_z->setValue(position.at(2));
+  ui.doubleSpinBox_q_x->setValue(position.at(3));
+  ui.doubleSpinBox_q_y->setValue(position.at(4));
+  ui.doubleSpinBox_q_z->setValue(position.at(5));
+  ui.doubleSpinBox_q_w->setValue(position.at(6));
+
+  writeLog("Read task pose");
+}
+
+// void MainWindow::on_btn_send_kinematic_pose_clicked(void)
+// {
+//   std::vector<double> kinematics_pose;
+//   Eigen::Quaterniond temp_orientation;
+
+//   bool position_only = ui.checkBox->isChecked();
+//   double position_tol = ui.doubleSpinBox_position_tol->value();
+//   double orientation_tol = ui.doubleSpinBox_orientation_tol->value();
+
+//   kinematics_pose.push_back(ui.doubleSpinBox_x->value());
+//   kinematics_pose.push_back(ui.doubleSpinBox_y->value());
+//   kinematics_pose.push_back(ui.doubleSpinBox_z->value());
+//   kinematics_pose.push_back(ui.doubleSpinBox_q_x->value());
+//   kinematics_pose.push_back(ui.doubleSpinBox_q_y->value());
+//   kinematics_pose.push_back(ui.doubleSpinBox_q_z->value());
+//   kinematics_pose.push_back(ui.doubleSpinBox_q_w->value());
 
 //   std::thread(
-//     [this, joint_angle]()
+//     [this, kinematics_pose, position_only, position_tol, orientation_tol]()
 //     {
-//       bool success = qnode.setJointSpacePath(joint_angle);
+//       bool success =
+//       qnode.setTaskSpacePath(kinematics_pose, position_only, position_tol, orientation_tol);
 //       if (!success) {
 //         QMetaObject::invokeMethod(
 //           this, [this]() {
@@ -257,13 +308,13 @@ void MainWindow::on_btn_read_joint_angle_clicked(void)
 //       } else {
 //         QMetaObject::invokeMethod(
 //           this, [this]() {
-//             writeLog("Send joint angle");
+//             writeLog("Send task pose");
 //           }, Qt::QueuedConnection);
 //       }
 //     }).detach();
 // }
 
- void MainWindow::on_btn_send_kinematic_pose_clicked(void)
+void MainWindow::on_btn_send_kinematic_pose_clicked(void)
   {
     // // double x_value[] = {0.286, 0.134, 0.286, 0.134, 0.18};
     // // double y_value[] = {0, 0, 0, 0, -0.05};
@@ -322,56 +373,6 @@ void MainWindow::on_btn_read_joint_angle_clicked(void)
       std::this_thread::sleep_for(std::chrono::seconds(5));
     }
   }
-
-void MainWindow::on_btn_read_kinematic_pose_clicked(void)
-{
-  std::vector<double> position = qnode.getPresentKinematicsPosition();
-  ui.doubleSpinBox_x->setValue(position.at(0));
-  ui.doubleSpinBox_y->setValue(position.at(1));
-  ui.doubleSpinBox_z->setValue(position.at(2));
-  ui.doubleSpinBox_q_x->setValue(position.at(3));
-  ui.doubleSpinBox_q_y->setValue(position.at(4));
-  ui.doubleSpinBox_q_z->setValue(position.at(5));
-  ui.doubleSpinBox_q_w->setValue(position.at(6));
-
-  writeLog("Read task pose");
-}
-
-void MainWindow::on_btn_send_kinematic_pose_clicked(void)
-{
-  std::vector<double> kinematics_pose;
-  Eigen::Quaterniond temp_orientation;
-
-  bool position_only = ui.checkBox->isChecked();
-  double position_tol = ui.doubleSpinBox_position_tol->value();
-  double orientation_tol = ui.doubleSpinBox_orientation_tol->value();
-
-  kinematics_pose.push_back(ui.doubleSpinBox_x->value());
-  kinematics_pose.push_back(ui.doubleSpinBox_y->value());
-  kinematics_pose.push_back(ui.doubleSpinBox_z->value());
-  kinematics_pose.push_back(ui.doubleSpinBox_q_x->value());
-  kinematics_pose.push_back(ui.doubleSpinBox_q_y->value());
-  kinematics_pose.push_back(ui.doubleSpinBox_q_z->value());
-  kinematics_pose.push_back(ui.doubleSpinBox_q_w->value());
-
-  std::thread(
-    [this, kinematics_pose, position_only, position_tol, orientation_tol]()
-    {
-      bool success =
-      qnode.setTaskSpacePath(kinematics_pose, position_only, position_tol, orientation_tol);
-      if (!success) {
-        QMetaObject::invokeMethod(
-          this, [this]() {
-            writeLog("[ERR!!] Failed to send service");
-          }, Qt::QueuedConnection);
-      } else {
-        QMetaObject::invokeMethod(
-          this, [this]() {
-            writeLog("Send task pose");
-          }, Qt::QueuedConnection);
-      }
-    }).detach();
-}
 
 void MainWindow::on_btn_set_gripper_clicked(void)
 {
