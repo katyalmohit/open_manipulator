@@ -23,6 +23,8 @@
 #include <QObject>
 #include <QMessageBox>
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include "../include/open_manipulator_x_gui/main_window.hpp"
 
 namespace open_manipulator_x_gui
@@ -315,64 +317,60 @@ void MainWindow::on_btn_read_kinematic_pose_clicked(void)
 // }
 
 void MainWindow::on_btn_send_kinematic_pose_clicked(void)
-  {
-    // // double x_value[] = {0.286, 0.134, 0.286, 0.134, 0.18};
-    // // double y_value[] = {0, 0, 0, 0, -0.05};
-    // // double z_value[] = {0.205, 0.241, 0.205, 0.241, 0.2};
-    // double x_value[] = {0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.134};
-    // double y_value[] = {-0.05, -0.06, -0.07, -0.08, -0.09, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.09, -0.08, -0.07, -0.06, -0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0};
-    // double z_value[] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.241};
-
-    // double x_value[] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.2, 0.19, 0.18, 0.17, 0.16, 0.15,
-    //                     0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15,
-    //                     0.3, 0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.2, 0.19, 0.18, 0.17, 0.16, 0.15,
-    //                     0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
-    //                     0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.2, 0.19, 0.18, 0.17, 0.16,
-    //                     0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15};
-    // double y_value[] = {0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09,
-    //                     0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-    //                     0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03,
-    //                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    //                     -0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.04 - 0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03,
-    //                     -0.04, -0.05, -0.06, -0.07, -0.08, -0.09, -0.1};
-    // double z_value[] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
-    //                     0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
-    //                     0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
-    //                     0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2};
-    double x_value[] = {0.3, 0.3, 0.15, 0.15, 0.15, 0.15, 0.3, 0.3, 0.3, 0.3, 0.15, 0.15, 0.3};
-    double y_value[] = {0.03, 0.1, 0.1, 0.03, 0.03, 0, 0, 0, -0.1, -0.03, -0.03, -0.1, 0};
-    double z_value[] = {0.2, 0.2, 0.2, 0.2, 0.23, 0.2, 0.2, 0.23, 0.2, 0.2, 0.2, 0.2, 0.2};
-    for (int i = 0; i < 13; i++)
+{
+  std::thread(
+    [this]()
     {
-      std::vector<double> kinematics_pose = {x_value[i], y_value[i], z_value[i]};
-      double path_time = ui.doubleSpinBox_time_cs->value();
-      std::vector<double> presentJointAngles = qnode.getPresentJointAngle();
-      // std::cout << "Present Joint Angles: ";
-      for (const double &angle : presentJointAngles)
+      // Define waypoint coordinates
+      double x_value[] = {0.3, 0.3, 0.15, 0.15, 0.15, 0.15, 0.3, 0.3, 0.3, 0.3, 0.15, 0.15, 0.3};
+      double y_value[] = {0.03, 0.1, 0.1, 0.03, 0.03, 0, 0, 0, -0.1, -0.03, -0.03, -0.1, 0};
+      double z_value[] = {0.2, 0.2, 0.2, 0.2, 0.23, 0.2, 0.2, 0.23, 0.2, 0.2, 0.2, 0.2, 0.2};
+      
+      // Default orientation (pointing down)
+      double qx = 1.0, qy = 0.0, qz = 0.0, qw = 0.0;
+      
+      // Get parameters from UI
+      bool position_only = true;  // Set to true if you only care about position
+      double position_tol = 0.01;
+      double orientation_tol = 0.1;
+      
+      for (int i = 0; i < 13; i++)
       {
-        std::cout << angle << " ";
+        // Create full 7-DOF pose vector (x, y, z, qx, qy, qz, qw)
+        std::vector<double> kinematics_pose = {
+          x_value[i], y_value[i], z_value[i], 
+          qx, qy, qz, qw
+        };
+        
+        QMetaObject::invokeMethod(
+          this, [this, i]() {
+            writeLog(QString("Executing waypoint %1").arg(i + 1));
+          }, Qt::QueuedConnection);
+
+        if (!qnode.setTaskSpacePath(kinematics_pose, position_only, position_tol, orientation_tol))
+        {
+          QMetaObject::invokeMethod(
+            this, [this]() {
+              writeLog("[ERR!!] Failed to send service");
+            }, Qt::QueuedConnection);
+          return;
+        }
+
+        QMetaObject::invokeMethod(
+          this, [this]() {
+            writeLog("Send task pose");
+          }, Qt::QueuedConnection);
+          
+        // Wait for motion to complete or use a fixed delay
+        std::this_thread::sleep_for(std::chrono::seconds(5));
       }
-      std::cout << std::endl;
-
-      // double path_time = 5.0;
-
-      // std::vector<double> kinematics_pose;
-      // double path_time = ui.doubleSpinBox_time_cs->value();
-
-      // kinematics_pose.push_back(ui.doubleSpinBox_x->value());
-      // kinematics_pose.push_back(ui.doubleSpinBox_y->value());
-      // kinematics_pose.push_back(ui.doubleSpinBox_z->value());
-
-      if (!qnode.setTaskSpacePath(kinematics_pose, path_time))
-      {
-        writeLog("[ERR!!] Failed to send service");
-        return;
-      }
-
-      writeLog("Send task pose");
-      std::this_thread::sleep_for(std::chrono::seconds(5));
-    }
-  }
+      
+      QMetaObject::invokeMethod(
+        this, [this]() {
+          writeLog("Custom trajectory execution completed");
+        }, Qt::QueuedConnection);
+    }).detach();
+}
 
 void MainWindow::on_btn_set_gripper_clicked(void)
 {
