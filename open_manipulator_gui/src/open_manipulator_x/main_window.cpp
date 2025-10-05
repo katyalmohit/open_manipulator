@@ -236,32 +236,92 @@ void MainWindow::on_btn_read_joint_angle_clicked(void)
   writeLog("Read joint angle");
 }
 
-void MainWindow::on_btn_send_joint_angle_clicked(void)
-{
-  std::vector<double> joint_angle;
+// void MainWindow::on_btn_send_joint_angle_clicked(void)
+// {
+//   std::vector<double> joint_angle;
 
-  joint_angle.push_back(ui.doubleSpinBox_j1->value());
-  joint_angle.push_back(ui.doubleSpinBox_j2->value());
-  joint_angle.push_back(ui.doubleSpinBox_j3->value());
-  joint_angle.push_back(ui.doubleSpinBox_j4->value());
+//   joint_angle.push_back(ui.doubleSpinBox_j1->value());
+//   joint_angle.push_back(ui.doubleSpinBox_j2->value());
+//   joint_angle.push_back(ui.doubleSpinBox_j3->value());
+//   joint_angle.push_back(ui.doubleSpinBox_j4->value());
 
-  std::thread(
-    [this, joint_angle]()
+//   std::thread(
+//     [this, joint_angle]()
+//     {
+//       bool success = qnode.setJointSpacePath(joint_angle);
+//       if (!success) {
+//         QMetaObject::invokeMethod(
+//           this, [this]() {
+//             writeLog("[ERR!!] Failed to send service");
+//           }, Qt::QueuedConnection);
+//       } else {
+//         QMetaObject::invokeMethod(
+//           this, [this]() {
+//             writeLog("Send joint angle");
+//           }, Qt::QueuedConnection);
+//       }
+//     }).detach();
+// }
+
+ void MainWindow::on_btn_send_kinematic_pose_clicked(void)
+  {
+    // // double x_value[] = {0.286, 0.134, 0.286, 0.134, 0.18};
+    // // double y_value[] = {0, 0, 0, 0, -0.05};
+    // // double z_value[] = {0.205, 0.241, 0.205, 0.241, 0.2};
+    // double x_value[] = {0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24, 0.134};
+    // double y_value[] = {-0.05, -0.06, -0.07, -0.08, -0.09, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.1, -0.09, -0.08, -0.07, -0.06, -0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0};
+    // double z_value[] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.241};
+
+    // double x_value[] = {0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.2, 0.19, 0.18, 0.17, 0.16, 0.15,
+    //                     0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15,
+    //                     0.3, 0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.2, 0.19, 0.18, 0.17, 0.16, 0.15,
+    //                     0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+    //                     0.29, 0.28, 0.27, 0.26, 0.25, 0.24, 0.23, 0.22, 0.21, 0.2, 0.19, 0.18, 0.17, 0.16,
+    //                     0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15};
+    // double y_value[] = {0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09,
+    //                     0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+    //                     0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03,
+    //                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    //                     -0.1, -0.09, -0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.04 - 0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03, -0.03,
+    //                     -0.04, -0.05, -0.06, -0.07, -0.08, -0.09, -0.1};
+    // double z_value[] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+    //                     0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+    //                     0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+    //                     0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2};
+    double x_value[] = {0.3, 0.3, 0.15, 0.15, 0.15, 0.15, 0.3, 0.3, 0.3, 0.3, 0.15, 0.15, 0.3};
+    double y_value[] = {0.03, 0.1, 0.1, 0.03, 0.03, 0, 0, 0, -0.1, -0.03, -0.03, -0.1, 0};
+    double z_value[] = {0.2, 0.2, 0.2, 0.2, 0.23, 0.2, 0.2, 0.23, 0.2, 0.2, 0.2, 0.2, 0.2};
+    for (int i = 0; i < 13; i++)
     {
-      bool success = qnode.setJointSpacePath(joint_angle);
-      if (!success) {
-        QMetaObject::invokeMethod(
-          this, [this]() {
-            writeLog("[ERR!!] Failed to send service");
-          }, Qt::QueuedConnection);
-      } else {
-        QMetaObject::invokeMethod(
-          this, [this]() {
-            writeLog("Send joint angle");
-          }, Qt::QueuedConnection);
+      std::vector<double> kinematics_pose = {x_value[i], y_value[i], z_value[i]};
+      double path_time = ui.doubleSpinBox_time_cs->value();
+      std::vector<double> presentJointAngles = qnode.getPresentJointAngle();
+      // std::cout << "Present Joint Angles: ";
+      for (const double &angle : presentJointAngles)
+      {
+        std::cout << angle << " ";
       }
-    }).detach();
-}
+      std::cout << std::endl;
+
+      // double path_time = 5.0;
+
+      // std::vector<double> kinematics_pose;
+      // double path_time = ui.doubleSpinBox_time_cs->value();
+
+      // kinematics_pose.push_back(ui.doubleSpinBox_x->value());
+      // kinematics_pose.push_back(ui.doubleSpinBox_y->value());
+      // kinematics_pose.push_back(ui.doubleSpinBox_z->value());
+
+      if (!qnode.setTaskSpacePath(kinematics_pose, path_time))
+      {
+        writeLog("[ERR!!] Failed to send service");
+        return;
+      }
+
+      writeLog("Send task pose");
+      std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+  }
 
 void MainWindow::on_btn_read_kinematic_pose_clicked(void)
 {
