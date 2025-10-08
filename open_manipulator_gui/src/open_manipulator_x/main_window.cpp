@@ -340,6 +340,9 @@ void MainWindow::on_btn_send_kinematic_pose_clicked(void)
       double qx = 1.0, qy = 0.0, qz = 0.0, qw = 0.0;
       int len_arr = sizeof(x_value)/sizeof(x_value[0]);
       
+      // Arrays to store joint angles at each waypoint
+      std::vector<double> angle_1, angle_2, angle_3, angle_4;
+      
       // Get parameters from UI
       bool position_only = true;  // Set to true if you only care about position
       double position_tol = 0.01;
@@ -377,11 +380,69 @@ void MainWindow::on_btn_send_kinematic_pose_clicked(void)
           std::this_thread::sleep_for(std::chrono::seconds(5));
         }
         
+        // Get current joint angles after motion completes
+        std::vector<double> current_joint_angles = qnode.getPresentJointAngle();
+        if (current_joint_angles.size() >= 4) {
+          angle_1.push_back(current_joint_angles[0]);
+          angle_2.push_back(current_joint_angles[1]);
+          angle_3.push_back(current_joint_angles[2]);
+          angle_4.push_back(current_joint_angles[3]);
+          
+          QMetaObject::invokeMethod(
+            this, [this, i, current_joint_angles]() {
+              writeLog(QString("Waypoint %1 joint angles: [%2, %3, %4, %5]")
+                .arg(i + 1)
+                .arg(current_joint_angles[0], 0, 'f', 4)
+                .arg(current_joint_angles[1], 0, 'f', 4)
+                .arg(current_joint_angles[2], 0, 'f', 4)
+                .arg(current_joint_angles[3], 0, 'f', 4));
+            }, Qt::QueuedConnection);
+        }
+        
       }
       
       QMetaObject::invokeMethod(
-        this, [this]() {
+        this, [this, angle_1, angle_2, angle_3, angle_4]() {
           writeLog("Custom trajectory execution completed");
+          writeLog("=== COLLECTED JOINT ANGLES ===");
+          
+          // Print angle_1 array
+          QString angle1_str = "angle_1 = [";
+          for (size_t i = 0; i < angle_1.size(); ++i) {
+            angle1_str += QString::number(angle_1[i], 'f', 4);
+            if (i < angle_1.size() - 1) angle1_str += ", ";
+          }
+          angle1_str += "]";
+          writeLog(angle1_str);
+          
+          // Print angle_2 array
+          QString angle2_str = "angle_2 = [";
+          for (size_t i = 0; i < angle_2.size(); ++i) {
+            angle2_str += QString::number(angle_2[i], 'f', 4);
+            if (i < angle_2.size() - 1) angle2_str += ", ";
+          }
+          angle2_str += "]";
+          writeLog(angle2_str);
+          
+          // Print angle_3 array
+          QString angle3_str = "angle_3 = [";
+          for (size_t i = 0; i < angle_3.size(); ++i) {
+            angle3_str += QString::number(angle_3[i], 'f', 4);
+            if (i < angle_3.size() - 1) angle3_str += ", ";
+          }
+          angle3_str += "]";
+          writeLog(angle3_str);
+          
+          // Print angle_4 array
+          QString angle4_str = "angle_4 = [";
+          for (size_t i = 0; i < angle_4.size(); ++i) {
+            angle4_str += QString::number(angle_4[i], 'f', 4);
+            if (i < angle_4.size() - 1) angle4_str += ", ";
+          }
+          angle4_str += "]";
+          writeLog(angle4_str);
+          
+          writeLog("=== END OF JOINT ANGLES ===");
         }, Qt::QueuedConnection);
     }).detach();
 }
